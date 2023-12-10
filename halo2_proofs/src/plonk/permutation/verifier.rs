@@ -124,7 +124,7 @@ impl<C: CurveAffine> Evaluated<C> {
             // l_0(X) * (1 - z_0(X)) = 0
             .chain(
                 self.sets.first().map(|first_set| {
-                    l_0 * &(C::Scalar::one() - &first_set.permutation_product_eval)
+                    l_0 * &(C::Scalar::ONE - &first_set.permutation_product_eval)
                 }),
             )
             // Enforce only for the last set.
@@ -198,7 +198,7 @@ impl<C: CurveAffine> Evaluated<C> {
                             current_delta *= &C::Scalar::DELTA;
                         }
 
-                        (left - &right) * (C::Scalar::one() - &(l_last + &l_blind))
+                        (left - &right) * (C::Scalar::ONE - &(l_last + &l_blind))
                     }),
             )
     }

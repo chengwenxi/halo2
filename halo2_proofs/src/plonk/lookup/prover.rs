@@ -175,7 +175,7 @@ impl<C: CurveAffine> Permuted<C> {
         // s_j(X) is the jth table expression in this lookup,
         // s'(X) is the compression of the permuted table expressions,
         // and i is the ith row of the expression.
-        let mut lookup_product = vec![C::Scalar::zero(); params.n as usize];
+        let mut lookup_product = vec![C::Scalar::ZERO; params.n as usize];
         // Denominator uses the permuted input expression and permuted table expression
         parallelize(&mut lookup_product, |lookup_product, start| {
             for ((lookup_product, permuted_input_value), permuted_table_value) in lookup_product
@@ -218,9 +218,9 @@ impl<C: CurveAffine> Permuted<C> {
 
         // Compute the evaluations of the lookup product polynomial
         // over our domain, starting with z[0] = 1
-        let z = iter::once(C::Scalar::one())
+        let z = iter::once(C::Scalar::ONE)
             .chain(lookup_product)
-            .scan(C::Scalar::one(), |state, cur| {
+            .scan(C::Scalar::ONE, |state, cur| {
                 *state *= &cur;
                 Some(*state)
             })
@@ -241,7 +241,7 @@ impl<C: CurveAffine> Permuted<C> {
             let u = (params.n as usize) - (blinding_factors + 1);
 
             // l_0(X) * (1 - z(X)) = 0
-            assert_eq!(z[0], C::Scalar::one());
+            assert_eq!(z[0], C::Scalar::ONE);
 
             // z(\omega X) (a'(X) + \beta) (s'(X) + \gamma)
             // - z(X) (\theta^{m-1} a_0(X) + ... + a_{m-1}(X) + \beta) (\theta^{m-1} s_0(X) + ... + s_{m-1}(X) + \gamma)
@@ -268,7 +268,7 @@ impl<C: CurveAffine> Permuted<C> {
             // l_last(X) * (z(X)^2 - z(X)) = 0
             // Assertion will fail only when soundness is broken, in which
             // case this z[u] value will be zero. (bad!)
-            assert_eq!(z[u], C::Scalar::one());
+            assert_eq!(z[u], C::Scalar::ONE);
         }
         let product_commitment = params.commit_lagrange(&z).to_affine();
 
@@ -399,7 +399,7 @@ fn permute_expression_pair<C: CurveAffine, R: RngCore>(
             *acc.entry(*coeff).or_insert(0) += 1;
             acc
         });
-    let mut permuted_table_coeffs = vec![C::Scalar::zero(); usable_rows];
+    let mut permuted_table_coeffs = vec![C::Scalar::ZERO; usable_rows];
 
     let mut repeated_input_rows = permuted_input_expression
         .iter()

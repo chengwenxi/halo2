@@ -144,10 +144,10 @@ fn plonk_api() {
                         || Ok(value.ok_or(Error::Synthesis)?.2),
                     )?;
 
-                    region.assign_fixed(|| "a", self.config.sa, 0, || Ok(FF::zero()))?;
-                    region.assign_fixed(|| "b", self.config.sb, 0, || Ok(FF::zero()))?;
-                    region.assign_fixed(|| "c", self.config.sc, 0, || Ok(FF::one()))?;
-                    region.assign_fixed(|| "a * b", self.config.sm, 0, || Ok(FF::one()))?;
+                    region.assign_fixed(|| "a", self.config.sa, 0, || Ok(FF::ZERO))?;
+                    region.assign_fixed(|| "b", self.config.sb, 0, || Ok(FF::ZERO))?;
+                    region.assign_fixed(|| "c", self.config.sc, 0, || Ok(FF::ONE))?;
+                    region.assign_fixed(|| "a * b", self.config.sm, 0, || Ok(FF::ONE))?;
                     Ok((lhs.cell(), rhs.cell(), out.cell()))
                 },
             )
@@ -198,10 +198,10 @@ fn plonk_api() {
                         || Ok(value.ok_or(Error::Synthesis)?.2),
                     )?;
 
-                    region.assign_fixed(|| "a", self.config.sa, 0, || Ok(FF::one()))?;
-                    region.assign_fixed(|| "b", self.config.sb, 0, || Ok(FF::one()))?;
-                    region.assign_fixed(|| "c", self.config.sc, 0, || Ok(FF::one()))?;
-                    region.assign_fixed(|| "a * b", self.config.sm, 0, || Ok(FF::zero()))?;
+                    region.assign_fixed(|| "a", self.config.sa, 0, || Ok(FF::ONE))?;
+                    region.assign_fixed(|| "b", self.config.sb, 0, || Ok(FF::ONE))?;
+                    region.assign_fixed(|| "c", self.config.sc, 0, || Ok(FF::ONE))?;
+                    region.assign_fixed(|| "a * b", self.config.sm, 0, || Ok(FF::ZERO))?;
                     Ok((lhs.cell(), rhs.cell(), out.cell()))
                 },
             )
@@ -228,7 +228,7 @@ fn plonk_api() {
                 || "public_input",
                 |mut region| {
                     let value = region.assign_advice(|| "value", self.config.a, 0, &mut f)?;
-                    region.assign_fixed(|| "public", self.config.sp, 0, || Ok(FF::one()))?;
+                    region.assign_fixed(|| "public", self.config.sp, 0, || Ok(FF::ONE))?;
 
                     Ok(value.cell())
                 },
@@ -360,7 +360,7 @@ fn plonk_api() {
         ) -> Result<(), Error> {
             let cs = StandardPlonk::new(config);
 
-            let _ = cs.public_input(&mut layouter, || Ok(F::one() + F::one()))?;
+            let _ = cs.public_input(&mut layouter, || Ok(F::ONE + F::ONE))?;
 
             for _ in 0..10 {
                 let mut a_squared = None;
@@ -391,8 +391,8 @@ fn plonk_api() {
     }
 
     let a = Fp::from(2834758237) * Fp::ZETA;
-    let instance = Fp::one() + Fp::one();
-    let lookup_table = vec![instance, a, a, Fp::zero()];
+    let instance = Fp::ONE + Fp::ONE;
+    let lookup_table = vec![instance, a, a, Fp::ZERO];
 
     let empty_circuit: MyCircuit<Fp> = MyCircuit {
         a: None,

@@ -48,8 +48,8 @@ where
     let u: ChallengeU<_> = transcript.squeeze_challenge_scalar();
     let h2 = transcript.read_point().map_err(|_| Error::SamplingError)?;
 
-    let (mut z_0_diff_inverse, mut z_0) = (C::Scalar::zero(), C::Scalar::zero());
-    let (mut outer_msm, mut r_outer_acc) = (PreMSM::<C>::new(), C::Scalar::zero());
+    let (mut z_0_diff_inverse, mut z_0) = (C::Scalar::ZERO, C::Scalar::ZERO);
+    let (mut outer_msm, mut r_outer_acc) = (PreMSM::<C>::new(), C::Scalar::ZERO);
     for (i, rotation_set) in rotation_sets.iter().enumerate() {
         let diffs: Vec<C::Scalar> = super_point_set
             .iter()
@@ -62,12 +62,12 @@ where
         if i == 0 {
             z_0 = evaluate_vanishing_polynomial(&rotation_set.points[..], *u);
             z_0_diff_inverse = z_diff_i.invert().unwrap();
-            z_diff_i = C::Scalar::one();
+            z_diff_i = C::Scalar::ONE;
         } else {
             z_diff_i.mul_assign(z_0_diff_inverse);
         }
 
-        let (mut inner_msm, mut r_inner_acc) = (ProjectiveMSM::new(), C::Scalar::zero());
+        let (mut inner_msm, mut r_inner_acc) = (ProjectiveMSM::new(), C::Scalar::ZERO);
         for commitment_data in rotation_set.commitments.iter() {
             // calculate low degree equivalent
             let r_x = lagrange_interpolate(&rotation_set.points[..], &commitment_data.evals()[..]);
@@ -80,7 +80,7 @@ where
                 // folded commitments to the inner_msm
                 CommitmentReference::MSM(msm) => msm.eval().to_curve(),
             };
-            inner_msm.append_term(C::Scalar::one(), inner_contrib);
+            inner_msm.append_term(C::Scalar::ONE, inner_contrib);
         }
         r_outer_acc = (*v * r_outer_acc) + (r_inner_acc * z_diff_i);
 
@@ -95,7 +95,7 @@ where
     outer_msm.append_term(*u, h2);
 
     let mut left = params.empty_msm();
-    left.append_term(C::Scalar::one(), h2);
+    left.append_term(C::Scalar::ONE, h2);
 
     let mut right = params.empty_msm();
     right.add_msm(&outer_msm);

@@ -257,7 +257,7 @@ pub fn verify_proof<
         let l_last = l_evals[0];
         let l_blind: C::Scalar = l_evals[1..(1 + blinding_factors)]
             .iter()
-            .fold(C::Scalar::zero(), |acc, eval| acc + eval);
+            .fold(C::Scalar::ZERO, |acc, eval| acc + eval);
         let l_0 = l_evals[1 + blinding_factors];
 
         // Compute the expected value of h(x)

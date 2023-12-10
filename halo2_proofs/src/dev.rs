@@ -304,7 +304,7 @@ impl<F: Group + Field> From<CellValue<F>> for Value<F> {
     fn from(value: CellValue<F>) -> Self {
         match value {
             // Cells that haven't been explicitly assigned to, default to zero.
-            CellValue::Unassigned => Value::Real(F::zero()),
+            CellValue::Unassigned => Value::Real(F::ZERO),
             CellValue::Assigned(v) => Value::Real(v),
             CellValue::Poison(_) => Value::Poison,
         }
@@ -344,7 +344,7 @@ impl<F: Group + Field> Mul for Value<F> {
             (Value::Real(x), Value::Poison) | (Value::Poison, Value::Real(x))
                 if x.is_zero_vartime() =>
             {
-                Value::Real(F::zero())
+                Value::Real(F::ZERO)
             }
             _ => Value::Poison,
         }
@@ -359,7 +359,7 @@ impl<F: Group + Field> Mul<F> for Value<F> {
             Value::Real(lhs) => Value::Real(lhs * rhs),
             // If poison is multiplied by zero, then we treat the poison as unconstrained
             // and we don't propagate it.
-            Value::Poison if rhs.is_zero_vartime() => Value::Real(F::zero()),
+            Value::Poison if rhs.is_zero_vartime() => Value::Real(F::ZERO),
             _ => Value::Poison,
         }
     }
@@ -699,7 +699,7 @@ impl<F: FieldExt> MockProver<F> {
                     return Err(Error::InstanceTooLarge);
                 }
 
-                instance.resize(n, F::zero());
+                instance.resize(n, F::ZERO);
                 Ok(instance)
             })
             .collect::<Result<Vec<_>, _>>()?;
@@ -878,7 +878,7 @@ impl<F: FieldExt> MockProver<F> {
                                 &|a, b| a + b,
                                 &|a, b| a * b,
                                 &|a, scalar| a * scalar,
-                                &Value::Real(F::zero()),
+                                &Value::Real(F::ZERO),
                             ) {
                                 Value::Real(x) if x.is_zero_vartime() => None,
                                 Value::Real(_) => Some(VerifyFailure::ConstraintNotSatisfied {
@@ -960,7 +960,7 @@ impl<F: FieldExt> MockProver<F> {
                             &|a, b| a + b,
                             &|a, b| a * b,
                             &|a, scalar| a * scalar,
-                            &Value::Real(F::zero()),
+                            &Value::Real(F::ZERO),
                         )
                     };
 
@@ -1131,7 +1131,7 @@ mod tests {
                         config.q.enable(&mut region, 1)?;
 
                         // Assign a = 0.
-                        region.assign_advice(|| "a", config.a, 0, || Ok(Fp::zero()))?;
+                        region.assign_advice(|| "a", config.a, 0, || Ok(Fp::ZERO))?;
 
                         // BUG: Forget to assign b = 0! This could go unnoticed during
                         // development, because cell values default to zero, which in this
@@ -1182,7 +1182,7 @@ mod tests {
 
                     // If q is enabled, a must be in the table.
                     // When q is not enabled, lookup the default value instead.
-                    let not_q = Expression::Constant(Fp::one()) - q.clone();
+                    let not_q = Expression::Constant(Fp::ONE) - q.clone();
                     let default = Expression::Constant(Fp::from(2));
                     vec![(q * a + not_q * default, table)]
                 });

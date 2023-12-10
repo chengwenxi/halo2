@@ -35,7 +35,7 @@ where
     let commitment_data = construct_intermediate_sets(queries);
 
     let mut commitment_multi = params.empty_msm();
-    let mut eval_multi = C::Scalar::zero();
+    let mut eval_multi = C::Scalar::ZERO;
 
     let mut witness = params.empty_msm();
     let mut witness_with_aux = params.empty_msm();
@@ -49,12 +49,12 @@ where
         witness_with_aux.scale(*u);
         witness_with_aux.append_term(z, wi);
         witness.scale(*u);
-        witness.append_term(C::Scalar::one(), wi);
+        witness.append_term(C::Scalar::ONE, wi);
         commitment_multi.scale(*u);
         eval_multi = eval_multi * *u;
 
         let mut commitment_batch = params.empty_msm();
-        let mut eval_batch = C::Scalar::zero();
+        let mut eval_batch = C::Scalar::ZERO;
 
         for query in commitment_at_a_point.queries.iter() {
             assert_eq!(query.get_point(), z);
@@ -65,7 +65,7 @@ where
             commitment_batch.scale(*v);
             match commitment {
                 CommitmentReference::Commitment(c) => {
-                    commitment_batch.append_term(C::Scalar::one(), *c);
+                    commitment_batch.append_term(C::Scalar::ONE, *c);
                 }
                 CommitmentReference::MSM(msm) => {
                     commitment_batch.add_msm(msm);

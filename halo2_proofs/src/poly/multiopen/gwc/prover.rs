@@ -25,7 +25,7 @@ where
     let commitment_data = construct_intermediate_sets(queries);
 
     let zero = || Polynomial::<C::Scalar, Coeff> {
-        values: vec![C::Scalar::zero(); params.n as usize],
+        values: vec![C::Scalar::ZERO; params.n as usize],
         _marker: PhantomData,
     };
 
@@ -38,7 +38,7 @@ where
         .zip(ws.par_iter_mut())
         .for_each(|(commitment_at_a_point, w)| {
             let mut poly_batch = zero();
-            let mut eval_batch = C::Scalar::zero();
+            let mut eval_batch = C::Scalar::ZERO;
             let z = commitment_at_a_point.point;
             for query in commitment_at_a_point.queries.iter() {
                 assert_eq!(query.get_point(), z);

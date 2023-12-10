@@ -49,7 +49,7 @@ impl<'a, C: CurveAffine> MSM<C> {
     /// Prepares all scalars in the MSM to linear combination
     pub fn combine_with_base(&mut self, base: C::Scalar) {
         use ff::Field;
-        let mut acc = C::Scalar::one();
+        let mut acc = C::Scalar::ONE;
         if !self.scalars.is_empty() {
             for scalar in self.scalars.iter_mut().rev() {
                 *scalar *= &acc;
@@ -137,7 +137,7 @@ impl<'a, E: Engine> ProjectiveMSM<E> {
     /// Prepares all scalars in the MSM to linear combination
     pub fn combine_with_base(&mut self, base: E::Scalar) {
         use ff::Field;
-        let mut acc = E::Scalar::one();
+        let mut acc = E::Scalar::ONE;
         if !self.scalars.is_empty() {
             for scalar in self.scalars.iter_mut().rev() {
                 *scalar *= &acc;
@@ -198,7 +198,7 @@ impl<'a, E: Engine> PreMSM<E> {
     /// Prepares all scalars in the MSM to linear combination
     pub fn combine_with_base(&mut self, base: E::Scalar) {
         use ff::Field;
-        let mut acc = E::Scalar::one();
+        let mut acc = E::Scalar::ONE;
         if !self.projectives_msms.is_empty() {
             for msm in self.projectives_msms.iter_mut().rev() {
                 msm.scale(acc);

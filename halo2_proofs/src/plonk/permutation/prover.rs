@@ -72,10 +72,10 @@ impl Argument {
         let blinding_factors = pk.vk.cs.blinding_factors();
 
         // Each column gets its own delta power.
-        let mut deltaomega = C::Scalar::one();
+        let mut deltaomega = C::Scalar::ONE;
 
         // Track the "last" value from the previous column set
-        let mut last_z = C::Scalar::one();
+        let mut last_z = C::Scalar::ONE;
 
         let mut sets = vec![];
 
@@ -92,7 +92,7 @@ impl Argument {
             // where p_j(X) is the jth column in this permutation,
             // and i is the ith row of the column.
 
-            let mut modified_values = vec![C::Scalar::one(); params.n as usize];
+            let mut modified_values = vec![C::Scalar::ONE; params.n as usize];
 
             // Iterate over each column of the permutation
             for (&column, permuted_column_values) in columns.iter().zip(permutations.iter()) {
@@ -150,7 +150,7 @@ impl Argument {
             // Compute the evaluations of the permutation product polynomial
             // over our domain, starting with z[0] = 1
 
-            let mut z = vec![C::Scalar::zero(); params.n as usize];
+            let mut z = vec![C::Scalar::ZERO; params.n as usize];
             z.par_iter_mut().enumerate().for_each(|(i, z)| {
                 if i > 0 {
                     *z = modified_values[i - 1];

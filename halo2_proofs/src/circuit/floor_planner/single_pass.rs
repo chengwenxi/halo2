@@ -485,7 +485,7 @@ mod tests {
                 layouter.assign_region(
                     || "assign constant",
                     |mut region| {
-                        region.assign_advice_from_constant(|| "one", config, 0, Scalar::one())
+                        region.assign_advice_from_constant(|| "one", config, 0, Scalar::ONE)
                     },
                 )?;
 

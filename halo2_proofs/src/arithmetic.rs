@@ -295,7 +295,7 @@ pub fn best_fft_cpu<G: Group>(a: &mut [G], omega: G::Scalar, log_n: u32) {
     // precompute twiddle factors
     let mut twiddles: Vec<_> = (0..(n / 2) as usize)
         .into_iter()
-        .map(|_| G::Scalar::one())
+        .map(|_| G::Scalar::ONE)
         .collect();
 
     let chunck_size = 1 << 14;
@@ -425,7 +425,7 @@ pub fn eval_polynomial<F: Field>(poly: &[F], point: F) -> F {
     fn evaluate<F: Field>(poly: &[F], point: F) -> F {
         poly.iter()
             .rev()
-            .fold(F::zero(), |acc, coeff| acc * point + coeff)
+            .fold(F::ZERO, |acc, coeff| acc * point + coeff)
     }
     let n = poly.len();
     let num_threads = multicore::current_num_threads();
@@ -433,7 +433,7 @@ pub fn eval_polynomial<F: Field>(poly: &[F], point: F) -> F {
         evaluate(poly, point)
     } else {
         let chunk_size = (n + num_threads - 1) / num_threads;
-        let mut parts = vec![F::zero(); num_threads];
+        let mut parts = vec![F::ZERO; num_threads];
         multicore::scope(|scope| {
             for (chunk_idx, (out, poly)) in
                 parts.chunks_mut(1).zip(poly.chunks(chunk_size)).enumerate()
@@ -444,7 +444,7 @@ pub fn eval_polynomial<F: Field>(poly: &[F], point: F) -> F {
                 });
             }
         });
-        parts.iter().fold(F::zero(), |acc, coeff| acc + coeff)
+        parts.iter().fold(F::ZERO, |acc, coeff| acc + coeff)
     }
 }
 
@@ -455,7 +455,7 @@ pub fn compute_inner_product<F: Field>(a: &[F], b: &[F]) -> F {
     // TODO: parallelize?
     assert_eq!(a.len(), b.len());
 
-    let mut acc = F::zero();
+    let mut acc = F::ZERO;
     for (a, b) in a.iter().zip(b.iter()) {
         acc += (*a) * (*b);
     }
@@ -472,9 +472,9 @@ where
     b = -b;
     let a = a.into_iter();
 
-    let mut q = vec![F::zero(); a.len() - 1];
+    let mut q = vec![F::ZERO; a.len() - 1];
 
-    let mut tmp = F::zero();
+    let mut tmp = F::ZERO;
     for (q, r) in q.iter_mut().rev().zip(a.rev()) {
         let mut lead_coeff = *r;
         lead_coeff.sub_assign(&tmp);
@@ -583,11 +583,11 @@ pub fn lagrange_interpolate<F: FieldExt>(points: &[F], evals: &[F]) -> Vec<F> {
         // Compute (x_j - x_k)^(-1) for each j != i
         denoms.iter_mut().for_each(|v| batch_invert(v));
 
-        let mut final_poly = vec![F::zero(); points.len()];
+        let mut final_poly = vec![F::ZERO; points.len()];
         for (j, (denoms, eval)) in denoms.into_iter().zip(evals.iter()).enumerate() {
             let mut tmp: Vec<F> = Vec::with_capacity(points.len());
             let mut product = Vec::with_capacity(points.len() - 1);
-            tmp.push(F::one());
+            tmp.push(F::ONE);
             for (x_k, denom) in points
                 .iter()
                 .enumerate()
@@ -595,11 +595,11 @@ pub fn lagrange_interpolate<F: FieldExt>(points: &[F], evals: &[F]) -> Vec<F> {
                 .map(|a| a.1)
                 .zip(denoms.into_iter())
             {
-                product.resize(tmp.len() + 1, F::zero());
+                product.resize(tmp.len() + 1, F::ZERO);
                 for ((a, b), product) in tmp
                     .iter()
-                    .chain(std::iter::once(&F::zero()))
-                    .zip(std::iter::once(&F::zero()).chain(tmp.iter()))
+                    .chain(std::iter::once(&F::ZERO))
+                    .zip(std::iter::once(&F::ZERO).chain(tmp.iter()))
                     .zip(product.iter_mut())
                 {
                     *product = *a * (-denom * x_k) + *b * denom;
@@ -618,7 +618,7 @@ pub fn lagrange_interpolate<F: FieldExt>(points: &[F], evals: &[F]) -> Vec<F> {
 
 pub(crate) fn _evaluate_vanishing_polynomial<F: FieldExt>(roots: &[F], z: F) -> F {
     fn evaluate<F: FieldExt>(roots: &[F], z: F) -> F {
-        roots.iter().fold(F::one(), |acc, point| (z - point) * acc)
+        roots.iter().fold(F::ONE, |acc, point| (z - point) * acc)
     }
     let n = roots.len();
     let num_threads = multicore::current_num_threads();
@@ -626,13 +626,13 @@ pub(crate) fn _evaluate_vanishing_polynomial<F: FieldExt>(roots: &[F], z: F) -> 
         evaluate(roots, z)
     } else {
         let chunk_size = (n + num_threads - 1) / num_threads;
-        let mut parts = vec![F::one(); num_threads];
+        let mut parts = vec![F::ONE; num_threads];
         multicore::scope(|scope| {
             for (out, roots) in parts.chunks_mut(1).zip(roots.chunks(chunk_size)) {
                 scope.spawn(move |_| out[0] = evaluate(roots, z));
             }
         });
-        parts.iter().fold(F::one(), |acc, part| acc * part)
+        parts.iter().fold(F::ONE, |acc, part| acc * part)
     }
 }
 

@@ -54,7 +54,7 @@ impl<G: Group> EvaluationDomain<G> {
             extended_k += 1;
         }
 
-        let mut extended_omega = G::Scalar::root_of_unity();
+        let mut extended_omega = G::Scalar::ROOT_OF_UNITY;
 
         // Get extended_omega, the 2^{extended_k}'th root of unity
         // The loop computes extended_omega = omega^{2 ^ (S - extended_k)}
@@ -102,7 +102,7 @@ impl<G: Group> EvaluationDomain<G> {
 
             // Subtract 1 from each to give us t_evaluations[i] = t(zeta * extended_omega^i)
             for coeff in &mut t_evaluations {
-                *coeff -= &G::Scalar::one();
+                *coeff -= &G::Scalar::ONE;
             }
 
             // Invert, because we're dividing by this polynomial.
@@ -461,13 +461,13 @@ impl<G: Group> EvaluationDomain<G> {
             results = Vec::with_capacity(rotations.size_hint().1.unwrap_or(0));
             for rotation in rotations {
                 let rotation = Rotation(rotation);
-                let result = x - self.rotate_omega(G::Scalar::one(), rotation);
+                let result = x - self.rotate_omega(G::Scalar::ONE, rotation);
                 results.push(result);
             }
             batch_invert(&mut results);
         }
 
-        let common = (xn - G::Scalar::one()) * self.barycentric_weight;
+        let common = (xn - G::Scalar::ONE) * self.barycentric_weight;
         for (rotation, result) in rotations.into_iter().zip(results.iter_mut()) {
             let rotation = Rotation(rotation);
             *result = self.rotate_omega(*result * common, rotation);
@@ -557,8 +557,8 @@ fn test_l_i() {
         points.push(domain.omega.pow(&[i, 0, 0, 0]));
     }
     for i in 0..8 {
-        let mut l_i = vec![Scalar::zero(); 8];
-        l_i[i] = Scalar::one();
+        let mut l_i = vec![Scalar::ZERO; 8];
+        l_i[i] = Scalar::ONE;
         let l_i = lagrange_interpolate(&points[..], &l_i[..]);
         l.push(l_i);
     }

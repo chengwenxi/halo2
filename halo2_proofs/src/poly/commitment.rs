@@ -15,6 +15,7 @@ use group::{prime::PrimeCurveAffine, Curve, Group as _, GroupEncoding};
 use rand_core::OsRng;
 use std::marker::PhantomData;
 use std::ops::{Add, AddAssign, Mul, MulAssign};
+use pairing;
 
 use std::io;
 
@@ -83,13 +84,13 @@ impl<C: CurveAffine> Params<C> {
         };
 
         let mut g_lagrange_projective = vec![E::G1::group_zero(); n as usize];
-        let mut root = E::Scalar::ROOT_OF_UNITY_INV.invert().unwrap();
+        let mut root = <<E as pairing::arithmetic::Engine>::Scalar as PrimeField>::ROOT_OF_UNITY_INV.invert().unwrap();
         for _ in k..E::Scalar::S {
             root = root.square();
         }
         let n_inv = Option::<E::Scalar>::from(E::Scalar::from(n).invert())
             .expect("inversion should be ok for n = 1<<k");
-        let multiplier = (s.pow_vartime(&[n as u64]) - E::Scalar::one()) * n_inv;
+        let multiplier = (s.pow_vartime(&[n as u64]) - E::Scalar::ONE) * n_inv;
         parallelize(&mut g_lagrange_projective, |g, start| {
             for (idx, g) in g.iter_mut().enumerate() {
                 let offset = start + idx;
@@ -244,7 +245,7 @@ pub struct Blind<F>(pub F);
 
 impl<F: FieldExt> Default for Blind<F> {
     fn default() -> Self {
-        Blind(F::one())
+        Blind(F::ONE)
     }
 }
 

@@ -265,8 +265,8 @@ impl<C: CurveAffine> Evaluator<C> {
     /// Creates a new evaluation structure
     pub fn new(cs: &ConstraintSystem<C::ScalarExt>) -> Self {
         let mut ev = Evaluator::default();
-        ev.add_constant(&C::ScalarExt::zero());
-        ev.add_constant(&C::ScalarExt::one());
+        ev.add_constant(&C::ScalarExt::ZERO);
+        ev.add_constant(&C::ScalarExt::ONE);
 
         // Custom gates
         for gate in cs.gates.iter() {
@@ -443,9 +443,9 @@ impl<C: CurveAffine> Evaluator<C> {
                 }
             }
             Expression::Scaled(a, f) => {
-                if *f == C::ScalarExt::zero() {
+                if *f == C::ScalarExt::ZERO {
                     ValueSource::Constant(0)
-                } else if *f == C::ScalarExt::one() {
+                } else if *f == C::ScalarExt::ONE {
                     self.add_expression(a)
                 } else {
                     let cst = self.add_constant(f);
@@ -476,14 +476,14 @@ impl<C: CurveAffine> Evaluator<C> {
         let extended_omega = domain.get_extended_omega();
         let num_lookups = pk.vk.cs.lookups.len();
         let isize = size as i32;
-        let one = C::ScalarExt::one();
+        let one = C::ScalarExt::ONE;
         let l0 = &pk.l0;
         let l_last = &pk.l_last;
         let l_active_row = &pk.l_active_row;
         let p = &pk.vk.cs.permutation;
 
         let mut values = domain.empty_extended();
-        let mut lookup_values = vec![C::Scalar::zero(); size * num_lookups];
+        let mut lookup_values = vec![C::Scalar::ZERO; size * num_lookups];
 
         // Core expression evaluations
         let num_threads = multicore::current_num_threads();
@@ -504,7 +504,7 @@ impl<C: CurveAffine> Evaluator<C> {
                         let table_values = table_values_box.unwrap();
                         let mut rotations = vec![0usize; self.rotations.len()];
                         let mut intermediates: Vec<C::ScalarExt> =
-                            vec![C::ScalarExt::zero(); self.calculations.len()];
+                            vec![C::ScalarExt::ZERO; self.calculations.len()];
                         for (i, value) in values.iter_mut().enumerate() {
                             let idx = start + i;
 
@@ -658,7 +658,7 @@ impl<C: CurveAffine> Evaluator<C> {
                     // combine fft with eval_h_lookups:
                     // fft code: from ec-gpu lib.
                     let mut buffer = vec![];
-                    buffer.resize(domain.extended_len(), C::Scalar::zero());
+                    buffer.resize(domain.extended_len(), C::Scalar::ZERO);
                     let closures = ec_gpu_gen::rust_gpu_tools::program_closures!(
                         |program, input: &mut [Fr]| -> ec_gpu_gen::EcResult<()> {
                             macro_rules! create_buffer_from {
@@ -696,9 +696,9 @@ impl<C: CurveAffine> Evaluator<C> {
 
                             // Precalculate:
                             // [omega^(0/(2^(deg-1))), omega^(1/(2^(deg-1))), ..., omega^((2^(deg-1)-1)/(2^(deg-1)))]
-                            let mut pq = vec![Fr::zero(); 1 << (max_deg - 1)];
+                            let mut pq = vec![Fr::ZERO; 1 << (max_deg - 1)];
                             let twiddle: Fr = omega.pow_vartime([(n >> max_deg) as u64]);
-                            pq[0] = Fr::one();
+                            pq[0] = Fr::ONE;
                             if max_deg > 1 {
                                 pq[1] = twiddle;
                                 for i in 2..(1 << max_deg >> 1) {
@@ -923,7 +923,7 @@ pub fn evaluate<F: FieldExt, B: Basis>(
     advice: &[Polynomial<F, B>],
     instance: &[Polynomial<F, B>],
 ) -> Vec<F> {
-    let mut values = vec![F::zero(); size];
+    let mut values = vec![F::ZERO; size];
     let isize = size as i32;
     parallelize(&mut values, |values, start| {
         for (i, value) in values.iter_mut().enumerate() {

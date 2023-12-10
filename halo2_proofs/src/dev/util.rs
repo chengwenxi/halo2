@@ -12,9 +12,9 @@ use crate::{
 pub(super) fn format_value<F: Field>(v: F) -> String {
     if v.is_zero_vartime() {
         "0".into()
-    } else if v == F::one() {
+    } else if v == F::ONE {
         "1".into()
-    } else if v == -F::one() {
+    } else if v == -F::ONE {
         "-1".into()
     } else {
         // Format value as hex.

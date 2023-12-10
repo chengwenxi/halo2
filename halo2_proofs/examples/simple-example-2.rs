@@ -96,10 +96,10 @@ impl<FF: FieldExt> StandardCs<FF> for StandardPlonk<FF> {
                     || Ok(values.ok_or(Error::Synthesis)?.2),
                 )?;
 
-                region.assign_fixed(|| "a", self.config.sa, 0, || Ok(FF::zero()))?;
-                region.assign_fixed(|| "b", self.config.sb, 0, || Ok(FF::zero()))?;
-                region.assign_fixed(|| "c", self.config.sc, 0, || Ok(FF::one()))?;
-                region.assign_fixed(|| "a * b", self.config.sm, 0, || Ok(FF::one()))?;
+                region.assign_fixed(|| "a", self.config.sa, 0, || Ok(FF::ZERO))?;
+                region.assign_fixed(|| "b", self.config.sb, 0, || Ok(FF::ZERO))?;
+                region.assign_fixed(|| "c", self.config.sc, 0, || Ok(FF::ONE))?;
+                region.assign_fixed(|| "a * b", self.config.sm, 0, || Ok(FF::ONE))?;
 
                 Ok((lhs.cell(), rhs.cell(), out.cell()))
             },
@@ -141,10 +141,10 @@ impl<FF: FieldExt> StandardCs<FF> for StandardPlonk<FF> {
                     || Ok(values.ok_or(Error::Synthesis)?.2),
                 )?;
 
-                region.assign_fixed(|| "a", self.config.sa, 0, || Ok(FF::one()))?;
-                region.assign_fixed(|| "b", self.config.sb, 0, || Ok(FF::one()))?;
-                region.assign_fixed(|| "c", self.config.sc, 0, || Ok(FF::one()))?;
-                region.assign_fixed(|| "a * b", self.config.sm, 0, || Ok(FF::zero()))?;
+                region.assign_fixed(|| "a", self.config.sa, 0, || Ok(FF::ONE))?;
+                region.assign_fixed(|| "b", self.config.sb, 0, || Ok(FF::ONE))?;
+                region.assign_fixed(|| "c", self.config.sc, 0, || Ok(FF::ONE))?;
+                region.assign_fixed(|| "a * b", self.config.sm, 0, || Ok(FF::ZERO))?;
 
                 Ok((lhs.cell(), rhs.cell(), out.cell()))
             },
@@ -194,7 +194,7 @@ impl<F: FieldExt> Circuit<F> for MyCircuit<F> {
             let sc = meta.query_fixed(sc, Rotation::cur());
             let sm = meta.query_fixed(sm, Rotation::cur());
 
-            vec![a.clone() * sa + b.clone() * sb + a * b * sm + (c * sc * (-F::one()))]
+            vec![a.clone() * sa + b.clone() * sb + a * b * sm + (c * sc * (-F::ONE))]
         });
 
         PlonkConfig {

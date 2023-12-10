@@ -55,8 +55,8 @@ fn main() {
     // Prepare the circuit you want to render.
     // You don't need to include any witness variables.
     let a = Fp::rand();
-    let instance = Fp::one() + Fp::one();
-    let lookup_table = vec![instance, a, a, Fp::zero()];
+    let instance = Fp::ONE + Fp::ONE;
+    let lookup_table = vec![instance, a, a, Fp::ZERO];
     let circuit: MyCircuit<Fp> = MyCircuit {
         a: None,
         lookup_table,

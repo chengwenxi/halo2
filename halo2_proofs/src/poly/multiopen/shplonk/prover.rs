@@ -32,7 +32,7 @@ struct CommitmentExtension<'a, C: CurveAffine> {
 impl<'a, C: CurveAffine> Commitment<C::Scalar, PolynomialPointer<'a, C>> {
     fn extend(&self, n: u64, points: Vec<C::Scalar>) -> CommitmentExtension<'a, C> {
         let mut poly = lagrange_interpolate(&points[..], &self.evals()[..]);
-        poly.resize(n as usize, C::Scalar::zero());
+        poly.resize(n as usize, C::Scalar::ZERO);
 
         let low_degree_equivalent = Polynomial {
             values: poly,
@@ -83,7 +83,7 @@ where
     I: IntoIterator<Item = ProverQuery<'a, C>> + Clone,
 {
     let zero = || Polynomial::<C::Scalar, Coeff> {
-        values: vec![C::Scalar::zero(); params.n as usize],
+        values: vec![C::Scalar::ZERO; params.n as usize],
         _marker: PhantomData,
     };
 
@@ -114,7 +114,7 @@ where
             // Q_i(X) = N_i(X) / Z_i(X) where
             // Z_i(X) = (x - r_i_0) * (x - r_i_1) * ...
             let mut poly = div_by_vanishing(n_x, points);
-            poly.resize(params.n as usize, C::Scalar::zero());
+            poly.resize(params.n as usize, C::Scalar::ZERO);
 
             Polynomial {
                 values: poly,
@@ -210,7 +210,7 @@ where
     // sanity check
     {
         let must_be_zero = eval_polynomial(&l_x.values[..], *u);
-        assert_eq!(must_be_zero, C::Scalar::zero());
+        assert_eq!(must_be_zero, C::Scalar::ZERO);
     }
 
     let mut h_x = div_by_vanishing(l_x, &[*u]);
